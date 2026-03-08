@@ -1,39 +1,63 @@
 # main.py
 from api_client import get_historical_obs
-from grapher import plot_temperature
+from grapher import (
+    plot_temperature,
+    plot_humidity,
+    plot_wind,
+    plot_pressure,
+    plot_solar_and_uv,
+    plot_precip_accumulated
+)
 import sys
 
 def main():
-    print("Tempest Weather Tool")
-    print("1: Fetch & Graph Last 24h Temperature")
-    print("2: Fetch & Save Last 24h Data (no graph)")
-    print("q: Quit")
+    while True:
+        print("\nTempest Weather Tool")
+        print("1: Temperature Graph (24h)")
+        print("2: Humidity Graph (24h)")
+        print("3: Wind Speed Graph (24h)")
+        print("4: Barometric Pressure Graph (24h)")
+        print("5: Solar Radiation & UV Index Graph (24h)")
+        print("6: Cumulative Precipitation Graph (24h)")
+        print("7: Fetch & Save 24h Data (CSV)")
+        print("q: Quit")
 
-    choice = input("Enter choice: ").strip().lower()
+        choice = input("Enter choice: ").strip().lower()
 
-    if choice == '1':
+        if choice == 'q' or choice == 'quit':
+            print("Goodbye!")
+            sys.exit(0)
+
         try:
             df = get_historical_obs(hours_back=24)
-            if df is not None:
-                print(f"Fetched {len(df)} observations.")
-                # Optional: print summary with local time
-                print(df[['timestamp_local', 'temp_f', 'humidity_pct']].describe().round(1))
-                plot_temperature(df)  # Assuming grapher.py uses 'timestamp' or update to 'timestamp_local'
+            if df is None:
+                print("No data returned from API.")
+                continue
+
+            print(f"Fetched {len(df)} observations.")
+
+            use_local = 'timestamp_local' in df.columns
+
+            if choice == '1':
+                plot_temperature(df, use_local_time=use_local)
+            elif choice == '2':
+                plot_humidity(df, use_local_time=use_local)
+            elif choice == '3':
+                plot_wind(df, use_local_time=use_local)
+            elif choice == '4':
+                plot_pressure(df, use_local_time=use_local)
+            elif choice == '5':
+                plot_solar_and_uv(df, use_local_time=use_local)
+            elif choice == '6':
+                plot_precip_accumulated(df, use_local_time=use_local)
+            elif choice == '7':
+                df.to_csv('historical_24h.csv', index=False)
+                print("Data saved to historical_24h.csv")
             else:
-                print("No data returned.")
-        except Exception as e:
-            print(f"Error fetching data: {e}")
-    elif choice == '2':
-        try:
-            df = get_historical_obs(hours_back=24)
-            df.to_csv('historical_24h.csv', index=False)
-            print("Data saved to historical_24h.csv")
+                print("Invalid choice. Try again.")
+
         except Exception as e:
             print(f"Error: {e}")
-    elif choice in ['q', 'quit', 'exit']:
-        sys.exit(0)
-    else:
-        print("Invalid choice.")
 
 if __name__ == "__main__":
     main()
