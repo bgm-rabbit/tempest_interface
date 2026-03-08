@@ -6,7 +6,8 @@ from grapher import (
     plot_wind,
     plot_pressure,
     plot_solar_and_uv,
-    plot_precip_accumulated
+    plot_precip_accumulated,
+    plot_wind_rose
 )
 import sys
 
@@ -20,6 +21,7 @@ def main():
         print("5: Solar Radiation & UV Index Graph (24h)")
         print("6: Cumulative Precipitation Graph (24h)")
         print("7: Fetch & Save 24h Data (CSV)")
+        print("8: Wind Rose (Direction & Speed Summary, 24h)")
         print("q: Quit")
 
         choice = input("Enter choice: ").strip().lower()
@@ -53,6 +55,8 @@ def main():
             elif choice == '7':
                 df.to_csv('historical_24h.csv', index=False)
                 print("Data saved to historical_24h.csv")
+            elif choice == '8':
+                plot_wind_rose(df)
             else:
                 print("Invalid choice. Try again.")
 

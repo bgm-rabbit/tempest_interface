@@ -1,6 +1,7 @@
 # grapher.py
 import matplotlib.pyplot as plt
 import pandas as pd  # for cumsum/clip
+import numpy as np  # For binning and averages
 
 def plot_temperature(df, save_path='feels_like_24h.png', use_local_time=True):
     time_col = 'timestamp_local' if use_local_time and 'timestamp_local' in df.columns else 'timestamp'
@@ -133,3 +134,54 @@ def plot_precip_accumulated(df, save_path='precip_24h.png', use_local_time=True)
     plt.savefig(save_path)
     plt.show()
     print(f"Precipitation graph saved as {save_path}")
+
+def plot_wind_rose(df, save_path='wind_rose_24h.png'):
+    # Filter valid data
+    valid = df['wind_dir_deg'].notna() & df['wind_avg_mph'].notna()
+    directions = df['wind_dir_deg'][valid]
+    speeds = df['wind_avg_mph'][valid]
+    
+    if len(directions) == 0:
+        print("No valid wind data for rose plot.")
+        return
+
+    # 16 bins for compass directions
+    num_bins = 16
+    bin_edges = np.linspace(0, 360, num_bins + 1)
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+    
+    # Histogram: frequency per bin
+    freq, _ = np.histogram(directions, bins=bin_edges)
+    freq = freq / len(directions) * 100  # % frequency
+    
+    # Average speed per bin
+    avg_speeds = []
+    for i in range(num_bins):
+        in_bin = (directions >= bin_edges[i]) & (directions < bin_edges[i+1])
+        avg_speeds.append(speeds[in_bin].mean() if in_bin.any() else 0)
+    
+    # Plot polar bar chart
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, polar=True)
+    
+    # Bars: height=freq, width=2π/num_bins, color by avg speed
+    width = 2 * np.pi / num_bins
+    colors = plt.cm.viridis(np.array(avg_speeds) / max(avg_speeds + [1]))  # Normalize colors
+    bars = ax.bar(np.deg2rad(bin_centers), freq, width=width, bottom=0.0, color=colors, edgecolor='grey')
+    
+    # Compass labels
+    ax.set_theta_zero_location('N')
+    ax.set_theta_direction(-1)  # Clockwise like compass
+    ax.set_xticks(np.linspace(0, 2*np.pi, 8, endpoint=False))
+    ax.set_xticklabels(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
+    
+    # Colorbar for avg speed
+    sm = plt.cm.ScalarMappable(cmap=plt.cm.viridis, norm=plt.Normalize(0, max(avg_speeds)))
+    cbar = plt.colorbar(sm, ax=ax, pad=0.1)
+    cbar.set_label('Avg Wind Speed (mph)')
+    
+    plt.title('Wind Rose: Direction Frequency & Avg Speed (Last 24h)', fontsize=14)
+    plt.tight_layout()
+    plt.savefig(save_path)
+    plt.show()
+    print(f"Wind rose graph saved as {save_path}")
