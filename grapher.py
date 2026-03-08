@@ -2,20 +2,29 @@
 import matplotlib.pyplot as plt
 import pandas as pd  # for cumsum/clip
 
-def plot_temperature(df, save_path='temp_24h.png', use_local_time=True):
+def plot_temperature(df, save_path='temp_dew_24h.png', use_local_time=True):
     time_col = 'timestamp_local' if use_local_time and 'timestamp_local' in df.columns else 'timestamp'
     
     plt.figure(figsize=(12, 6))
-    plt.plot(df[time_col], df['temp_f'], color='orange', linewidth=2, marker='o', markersize=3, alpha=0.8)
-    plt.title('Temperature Over the Last 24 Hours (°F)', fontsize=14)
+    
+    # Temperature line
+    plt.plot(df[time_col], df['temp_f'], color='orange', linewidth=2, marker='o', markersize=3, alpha=0.8, label='Temperature (°F)')
+    
+    # Dew point line (only where valid)
+    valid_dew = df['dew_point_f'].notna()
+    plt.plot(df[time_col][valid_dew], df['dew_point_f'][valid_dew], 
+             color='purple', linewidth=2.5, linestyle='-', label='Dew Point (°F)')
+    
+    plt.title('Temperature & Dew Point Over the Last 24 Hours (°F)', fontsize=14)
     plt.xlabel('Time', fontsize=12)
-    plt.ylabel('Temperature (°F)', fontsize=12)
+    plt.ylabel('Temperature / Dew Point (°F)', fontsize=12)
+    plt.legend(loc='upper left')
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig(save_path)
     plt.show()
-    print(f"Temperature graph saved as {save_path}")
+    print(f"Temperature & Dew Point graph saved as {save_path}")
 
 def plot_humidity(df, save_path='humidity_24h.png', use_local_time=True):
     time_col = 'timestamp_local' if use_local_time and 'timestamp_local' in df.columns else 'timestamp'

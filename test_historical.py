@@ -1,11 +1,9 @@
 # test_historical.py
-import requests
 import os
-from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 import pandas as pd
 import matplotlib.pyplot as plt
-import pytz
+from api_client import get_historical_obs
 
 
 load_dotenv()

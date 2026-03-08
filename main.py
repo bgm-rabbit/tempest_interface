@@ -13,7 +13,7 @@ import sys
 def main():
     while True:
         print("\nTempest Weather Tool")
-        print("1: Temperature Graph (24h)")
+        print("1: Temperature and Dew Point Graph (24h)")
         print("2: Humidity Graph (24h)")
         print("3: Wind Speed Graph (24h)")
         print("4: Barometric Pressure Graph (24h)")
