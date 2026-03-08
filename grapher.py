@@ -2,29 +2,39 @@
 import matplotlib.pyplot as plt
 import pandas as pd  # for cumsum/clip
 
-def plot_temperature(df, save_path='temp_dew_24h.png', use_local_time=True):
+def plot_temperature(df, save_path='feels_like_24h.png', use_local_time=True):
     time_col = 'timestamp_local' if use_local_time and 'timestamp_local' in df.columns else 'timestamp'
     
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(14, 7))
     
-    # Temperature line
-    plt.plot(df[time_col], df['temp_f'], color='orange', linewidth=2, marker='o', markersize=3, alpha=0.8, label='Temperature (°F)')
+    # Air temperature
+    plt.plot(df[time_col], df['temp_f'], color='orange', linewidth=2.5, marker='o', markersize=4, alpha=0.9, label='Air Temp (°F)')
     
-    # Dew point line (only where valid)
+    # Dew point
     valid_dew = df['dew_point_f'].notna()
     plt.plot(df[time_col][valid_dew], df['dew_point_f'][valid_dew], 
-             color='purple', linewidth=2.5, linestyle='-', label='Dew Point (°F)')
+             color='purple', linewidth=2, linestyle='-', alpha=0.8, label='Dew Point (°F)')
     
-    plt.title('Temperature & Dew Point Over the Last 24 Hours (°F)', fontsize=14)
+    # Wind chill (only plot where it's lower than air temp)
+    valid_chill = (df['wind_chill_f'] < df['temp_f']) & df['wind_chill_f'].notna()
+    plt.plot(df[time_col][valid_chill], df['wind_chill_f'][valid_chill], 
+             color='blue', linewidth=2, linestyle='--', label='Wind Chill (°F)')
+    
+    # Heat index (only plot where it's higher than air temp)
+    valid_hi = (df['heat_index_f'] > df['temp_f']) & df['heat_index_f'].notna()
+    plt.plot(df[time_col][valid_hi], df['heat_index_f'][valid_hi], 
+             color='red', linewidth=2, linestyle='--', label='Heat Index (°F)')
+    
+    plt.title('Temperature, Dew Point, Wind Chill & Heat Index (Feels Like) – Last 24 Hours (°F)', fontsize=14)
     plt.xlabel('Time', fontsize=12)
-    plt.ylabel('Temperature / Dew Point (°F)', fontsize=12)
-    plt.legend(loc='upper left')
+    plt.ylabel('°F', fontsize=12)
+    plt.legend(loc='best', fontsize=10)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig(save_path)
     plt.show()
-    print(f"Temperature & Dew Point graph saved as {save_path}")
+    print(f"Feels-like graph (Temp/Dew/Wind Chill/Heat Index) saved as {save_path}")
 
 def plot_humidity(df, save_path='humidity_24h.png', use_local_time=True):
     time_col = 'timestamp_local' if use_local_time and 'timestamp_local' in df.columns else 'timestamp'
