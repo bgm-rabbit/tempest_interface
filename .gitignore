@@ -26,8 +26,9 @@ dist/
 *.egg-info/
 
 # Generated plots / exports (optional)
-*.png
-*.csv
+outputs/*.png
+outputs/*.csv
+
 
 # Environment files
 .env

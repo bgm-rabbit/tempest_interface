@@ -1,4 +1,6 @@
 # main.py
+import sys
+import os
 from api_client import get_historical_obs
 from grapher import (
     plot_temperature,
@@ -10,7 +12,6 @@ from grapher import (
     plot_wind_rose,
     plot_lightning
 )
-import sys
 
 current_start = None  # Global for custom start (str)
 current_end = None    # Global for custom end (str)
@@ -21,15 +22,15 @@ def main():
         print("\nTempest Weather Tool")
         print(f"Current Timeframe: {'Default 24h' if not current_start else f'{current_start} to {current_end} (local)'}")
         print("0: Set Custom Timeframe")
-        print("1: Temperature and Dew Point Graph (24h)")
-        print("2: Humidity Graph (24h)")
-        print("3: Wind Speed Graph (24h)")
-        print("4: Barometric Pressure Graph (24h)")
-        print("5: Solar Radiation & UV Index Graph (24h)")
-        print("6: Cumulative Precipitation Graph (24h)")
-        print("7: Fetch & Save 24h Data (CSV)")
-        print("8: Wind Rose (Direction & Speed Summary, 24h)")
-        print("9: Lightning Strikes Graph (24h)")
+        print("1: Temperature and Dew Point Graph")
+        print("2: Humidity Graph")
+        print("3: Wind Speed Graph")
+        print("4: Barometric Pressure Graph")
+        print("5: Solar Radiation & UV Index Graph")
+        print("6: Cumulative Precipitation Graph")
+        print("7: Fetch & Save Data (CSV)")
+        print("8: Wind Rose (Direction & Speed Summary)")
+        print("9: Lightning Strikes Graph")
         print("q: Quit")
 
         choice = input("Enter choice: ").strip().lower()
@@ -39,13 +40,13 @@ def main():
             sys.exit(0)
 
         try:
-            if choice == '0':  # New: Set timeframe
+            if choice == '0':  # Set timeframe
                 print("Enter start time (YYYY-MM-DD HH:MM, local time; blank for 24h back):")
                 new_start = input().strip() or None
                 print("Enter end time (YYYY-MM-DD HH:MM, local time; blank for now):")
                 new_end = input().strip() or None
-                # Test parse to validate
-                get_historical_obs(start_str=new_start, end_str=new_end)  # Dry run to check
+                # Dry run to validate
+                get_historical_obs(start_str=new_start, end_str=new_end)
                 current_start = new_start
                 current_end = new_end
                 print("Timeframe updated.")
@@ -54,6 +55,9 @@ def main():
             df = get_historical_obs(start_str=current_start, end_str=current_end)
             if df is None:
                 print("No data returned from API.")
+                continue
+            if df.empty:
+                print("Fetched data is empty—check timeframe or station.")
                 continue
 
             print(f"Fetched {len(df)} observations over selected timeframe.")
@@ -74,13 +78,15 @@ def main():
             elif choice == '6':
                 plot_precip_accumulated(df, use_local_time=use_local, timeframe_str=timeframe_str)
             elif choice == '7':
-                save_path = 'historical_data.csv'  # Or dynamic name with dates
+                # Dynamic name based on timeframe
+                csv_name = f'historical_{current_start.replace(" ", "_") if current_start else "24h"}.csv'
+                save_path = os.path.join('outputs', csv_name)
                 df.to_csv(save_path, index=False)
                 print(f"Data saved to {save_path}")
             elif choice == '8':
-                plot_wind_rose(df)
-            elif choice == '9':  # New
-                plot_lightning(df, use_local_time=use_local)
+                plot_wind_rose(df, timeframe_str=timeframe_str)
+            elif choice == '9':
+                plot_lightning(df, use_local_time=use_local, timeframe_str=timeframe_str)
             else:
                 print("Invalid choice. Try again.")
 

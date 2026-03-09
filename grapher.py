@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd  # for cumsum/clip
 import numpy as np  # For binning and averages
+import os
 
 
 def _prepare_plot(df, required_cols=None, use_local_time=True, graph_name='graph'):
@@ -62,6 +63,7 @@ def plot_temperature(df, save_path='feels_like_24h.png', use_local_time=True, ti
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(rotation=45)
     plt.tight_layout()
+    save_path = os.path.join('outputs', save_path)  # Prepend folder
     plt.savefig(save_path)
     if show:
         plt.show()
@@ -81,21 +83,19 @@ def plot_humidity(df, save_path='humidity_24h.png', use_local_time=True, timefra
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(rotation=45)
     plt.tight_layout()
+    save_path = os.path.join('outputs', save_path)  # Prepend folder
     plt.savefig(save_path)
     if show:
         plt.show()
     print(f"Humidity graph saved as {save_path}")
 
 def plot_wind(df, save_path='wind_24h.png', use_local_time=True, timeframe_str='Last 24 Hours', show=True):
-    time_col = _prepare_plot(df, use_local_time=use_local_time, graph_name='wind graph')
+    time_col = _prepare_plot(df, required_cols=['wind_avg_ms'], use_local_time=use_local_time, graph_name='wind graph')
     if not time_col:
         return
 
     # Convert m/s to mph if possible
-    if 'wind_avg_ms' in df.columns:
-        df['wind_avg_mph'] = (df['wind_avg_ms'] * 2.23694).round(1)
-    else:
-        df['wind_avg_mph'] = np.nan
+    df['wind_avg_mph'] = (df['wind_avg_ms'] * 2.23694).round(1)
 
     if 'wind_gust_ms' in df.columns:
         df['wind_gust_mph'] = (df['wind_gust_ms'] * 2.23694).round(1)
@@ -113,6 +113,7 @@ def plot_wind(df, save_path='wind_24h.png', use_local_time=True, timeframe_str='
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(rotation=45)
     plt.tight_layout()
+    save_path = os.path.join('outputs', save_path)  # Prepend folder
     plt.savefig(save_path)
     if show:
         plt.show()
@@ -134,6 +135,7 @@ def plot_pressure(df, save_path='pressure_24h.png', use_local_time=True, timefra
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(rotation=45)
     plt.tight_layout()
+    save_path = os.path.join('outputs', save_path)  # Prepend folder
     plt.savefig(save_path)
     if show:
         plt.show()
@@ -161,6 +163,7 @@ def plot_solar_and_uv(df, save_path='solar_uv_24h.png', use_local_time=True, tim
     fig.legend(loc='upper right')
     plt.xticks(rotation=45)
     plt.tight_layout()
+    save_path = os.path.join('outputs', save_path)  # Prepend folder
     plt.savefig(save_path)
     if show:
         plt.show()
@@ -184,17 +187,18 @@ def plot_precip_accumulated(df, save_path='precip_24h.png', use_local_time=True,
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(rotation=45)
     plt.tight_layout()
+    save_path = os.path.join('outputs', save_path)  # Prepend folder
     plt.savefig(save_path)
     if show:
         plt.show()
     print(f"Precipitation graph saved as {save_path}")
 
 def plot_wind_rose(df, save_path='wind_rose_24h.png', timeframe_str='Last 24 Hours', show=True):
+    required_cols = ['wind_dir_deg', 'wind_avg_mph']
     if df is None or df.empty:
         print("No data available for wind rose plot.")
         return
 
-    required_cols = ['wind_dir_deg', 'wind_avg_mph']
     missing = [c for c in required_cols if c not in df.columns]
     if missing:
         print(f"Required columns missing for wind rose plot: {missing}")
@@ -246,12 +250,13 @@ def plot_wind_rose(df, save_path='wind_rose_24h.png', timeframe_str='Last 24 Hou
     
     plt.title(f'Wind Rose: Direction Frequency & Avg Speed {timeframe_str}', fontsize=14)
     plt.tight_layout()
+    save_path = os.path.join('outputs', save_path)  # Prepend folder
     plt.savefig(save_path)
     if show:
         plt.show()
     print(f"Wind rose graph saved as {save_path}")
 
-def plot_lightning(df, save_path='lightning_24h.png', use_local_time=True, show=True):
+def plot_lightning(df, save_path='lightning_24h.png', use_local_time=True, timeframe_str='Last 24 Hours', show=True):
     time_col = _prepare_plot(df, required_cols=['strike_count', 'strike_distance_km'], use_local_time=use_local_time, graph_name='lightning graph')
     if not time_col:
         return
@@ -282,10 +287,11 @@ def plot_lightning(df, save_path='lightning_24h.png', use_local_time=True, show=
     ax2.set_ylabel('Average Distance (miles)', color='blue', fontsize=12)
     ax2.tick_params(axis='y', labelcolor='blue')
     
-    plt.title('Lightning Strikes: Count per Hour & Average Distance (miles)', fontsize=14)
+    plt.title(f'Lightning Strikes: Count per Hour & Average Distance (miles) – {timeframe_str}', fontsize=14)
     fig.legend(loc='upper right', fontsize=10)
     plt.xticks(rotation=45)
     plt.tight_layout()
+    save_path = os.path.join('outputs', save_path)  # Prepend folder
     plt.savefig(save_path)
     if show:
         plt.show()
