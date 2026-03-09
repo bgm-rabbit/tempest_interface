@@ -69,5 +69,5 @@ Run unit/integration tests:
 - Future ideas: GUI with Streamlit, forecasts via OpenWeatherMap, alerts.
 
 ## License
-MIT License (or your choice)—feel free to use/modify.
+This project is licensed under the MIT License - see the LICENSE.md file for details.
 
