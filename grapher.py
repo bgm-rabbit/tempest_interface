@@ -257,6 +257,10 @@ def plot_wind_rose(df, save_path='wind_rose_24h.png', timeframe_str='Last 24 Hou
     print(f"Wind rose graph saved as {save_path}")
 
 def plot_lightning(df, save_path='lightning_24h.png', use_local_time=True, timeframe_str='Last 24 Hours', show=True):
+    if df is None or df.empty:
+        print("No lightning strikes detected in timeframe—graph will be empty.")
+        return
+
     time_col = _prepare_plot(df, required_cols=['strike_count', 'strike_distance_km'], use_local_time=use_local_time, graph_name='lightning graph')
     if not time_col:
         return

@@ -35,7 +35,7 @@ def test_main_invalid_choice(mock_input, capsys):
     with pytest.raises(SystemExit):
         main()
     captured = capsys.readouterr()
-    assert "Invalid choice" in captured.out
+    assert "Invalid choice. Try again." in captured.out
 
 @pytest.mark.parametrize("choice, expected_output_snippet", [
     ('1', "Fetched"),  # Temperature graph
@@ -71,8 +71,9 @@ def test_main_fetch_error(mock_input, mock_get_historical_obs, capsys):
     assert "API error" in captured.out
 
 # Add if you have timeframe setting
-def test_main_set_timeframe(mock_input, capsys):
+def test_main_set_timeframe(mock_input, mock_get_historical_obs, capsys):
     mock_input.side_effect = ['0', '2026-03-08 00:00', '', 'q']  # Start date, blank end (now)
+    mock_get_historical_obs.return_value = pd.DataFrame({'temp_f': [50]})
     with pytest.raises(SystemExit):
         main()
     captured = capsys.readouterr()

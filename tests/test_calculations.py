@@ -1,5 +1,5 @@
 # tests/test_calculations.py
-from api_client import calculate_wind_chill_f, calculate_heat_index_f, calculate_dew_point_c
+from data_processor import calculate_wind_chill_f, calculate_heat_index_f, calculate_dew_point_c
 
 def test_wind_chill():
     assert calculate_wind_chill_f(40, 10) < 40  # Wind chill lowers perceived temp

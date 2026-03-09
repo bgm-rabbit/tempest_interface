@@ -2,7 +2,8 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from datetime import datetime
-from api_client import get_historical_obs, calculate_dew_point_c  # Add other functions as needed
+from api_client import get_historical_obs  # Add other functions as needed
+from data_processor import calculate_dew_point_c
 
 def test_get_historical_obs_valid_range():
     with patch('requests.get') as mock_get:
