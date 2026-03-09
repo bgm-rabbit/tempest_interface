@@ -133,6 +133,8 @@ def get_historical_obs(hours_back=24, start_str=None, end_str=None, local_tz_str
                 'precip_mm_interval': obs[12],
                 'uv_index': obs[10],
                 'solar_rad_wm2': obs[11],
+                'strike_count': obs[14],  # Strikes in interval (int)
+                'strike_distance_km': obs[15],  # Distance to nearest (km, float)
             }
             records.append(record)
 

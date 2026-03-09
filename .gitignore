@@ -1,3 +1,33 @@
-.env
+# Python cache / compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+
+# Test output / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Generated plots / exports (optional)
 *.png
 *.csv
+
+# Environment files
+.env

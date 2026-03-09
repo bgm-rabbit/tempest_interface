@@ -7,7 +7,8 @@ from grapher import (
     plot_pressure,
     plot_solar_and_uv,
     plot_precip_accumulated,
-    plot_wind_rose
+    plot_wind_rose,
+    plot_lightning
 )
 import sys
 
@@ -28,6 +29,7 @@ def main():
         print("6: Cumulative Precipitation Graph (24h)")
         print("7: Fetch & Save 24h Data (CSV)")
         print("8: Wind Rose (Direction & Speed Summary, 24h)")
+        print("9: Lightning Strikes Graph (24h)")
         print("q: Quit")
 
         choice = input("Enter choice: ").strip().lower()
@@ -77,6 +79,8 @@ def main():
                 print(f"Data saved to {save_path}")
             elif choice == '8':
                 plot_wind_rose(df)
+            elif choice == '9':  # New
+                plot_lightning(df, use_local_time=use_local)
             else:
                 print("Invalid choice. Try again.")
 
